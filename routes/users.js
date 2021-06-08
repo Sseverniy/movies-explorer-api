@@ -13,4 +13,4 @@ userRoutes.patch('/me', celebrate({
   }),
 }), updateUser);
 
-exports.userRoutes = userRoutes;
+module.exports = userRoutes;

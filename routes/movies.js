@@ -29,3 +29,5 @@ movieRoutes.delete('/:movieId', celebrate({
   }),
   headers: Joi.object().keys({}).unknown(true),
 }), deleteMovie);
+
+module.exports = movieRoutes;
