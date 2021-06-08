@@ -1,7 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const { errors } = require('celebrate');
-const helmet = require('helmet');
+// const helmet = require('helmet');
 const limiter = require('./middlewares/limiter');
 const mainRouter = require('./routes/index');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
@@ -17,7 +17,7 @@ mongoose.connect('mongodb://localhost:27017/bitfilmsdb', {
 });
 
 app.use(express.json());
-app.use(helmet);
+// app.use(helmet);
 app.use(limiter);
 app.use(requestLogger);
 
