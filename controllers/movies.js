@@ -5,7 +5,7 @@ const ForbiddenError = require('../errors/ForbiddenError');
 
 exports.getMovies = (req, res, next) => {
   Movie.find({})
-    .then((movies) => res.status(200).send(movies))
+    .then((movies) => res.send(movies))
     .catch(next);
 };
 
@@ -39,11 +39,12 @@ exports.createMovie = (req, res, next) => {
     nameEN,
     owner,
   })
-    .then((movie) => res.status(200).send(movie))
+    .then((movie) => res.send(movie))
     .catch((err) => {
       if (err.name === 'CastError' || err.name === 'ValidationError') {
         throw new CastError('Переданы некорректные данные');
       }
+      throw err;
     })
     .catch(next);
 };
@@ -59,15 +60,13 @@ exports.deleteMovie = (req, res, next) => {
         throw new ForbiddenError('Нет прав для удаления карточки');
       }
       return Movie.remove(movie)
-        .then(() => res.status(200).send({ message: 'Карточка удалена' }))
-        .catch((err) => {
-          if (err.name === 'CastError' || err.name === 'ValidationError') {
-            throw new CastError('Переданы некорректные данные');
-          } else {
-            next(err);
-          }
-        })
-        .catch(next);
+        .then(() => res.send({ message: 'Карточка удалена' }));
     })
-    .catch(next);
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        next(new CastError('Переданы некорректные данные'));
+      } else {
+        next(err);
+      }
+    });
 };

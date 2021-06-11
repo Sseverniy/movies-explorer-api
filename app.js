@@ -6,6 +6,7 @@ require('dotenv').config();
 const limiter = require('./middlewares/limiter');
 const mainRouter = require('./routes/index');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
+const errorHandler = require('./middlewares/errorHandler');
 
 const app = express();
 
@@ -19,22 +20,15 @@ mongoose.connect('mongodb://localhost:27017/bitfilmsdb', {
 
 app.use(express.json());
 // app.use(helmet);
-app.use(limiter);
 app.use(requestLogger);
+app.use(limiter);
 
 app.use('/', mainRouter);
 
 app.use(errorLogger);
 
 app.use(errors());
-// eslint-disable-next-line no-unused-vars
-app.use((err, req, res, next) => {
-  const { statusCode = 500, message } = err;
 
-  return res.status(statusCode).send({ message: statusCode === 500 ? 'На сервере произошла ошибка' : message });
-});
+app.use(errorHandler);
 
-app.listen(PORT, () => {
-  // eslint-disable-next-line no-console
-  console.log(`App listening on port ${PORT}`);
-});
+app.listen(PORT);

@@ -14,7 +14,7 @@ const getUser = (req, res, next) => {
       if (!user) {
         throw new NotFoundError('Ресурс не найден');
       }
-      res.status(200).send({
+      res.send({
         email: user.email,
         name: user.name,
       });
@@ -23,6 +23,7 @@ const getUser = (req, res, next) => {
       if (err.name === 'CastError' || err.name === 'ValidationError') {
         throw new CastError('Переданы некорректные данные');
       }
+      throw err;
     })
     .catch(next);
 };
@@ -34,20 +35,19 @@ const updateUser = (req, res, next) => {
       if (!user) {
         throw new NotFoundError('Ресурс не найден');
       }
-      res.status(200).send(user);
+      res.send(user);
     })
     .catch((err) => {
-      if (err.name === 'CastError' || err.name === 'ValidationError') {
+      if (err.name === 'ValidationError') {
         throw new CastError('Переданы некорректные данные');
       }
+      throw err;
     })
     .catch(next);
 };
 
 const createUser = (req, res, next) => {
   const { name, email, password } = req.body;
-  // eslint-disable-next-line no-debugger
-  debugger;
   if (!email || !password) {
     throw new CastError('Введите почту и пароль');
   }
@@ -60,11 +60,12 @@ const createUser = (req, res, next) => {
         .then((hash) => User.create({
           name, email, password: hash,
         }))
-        .then(() => res.status(200).send({ message: 'Пользователь успешно создан!' }))
+        .then(() => res.send({ message: 'Пользователь успешно создан!' }))
         .catch((err) => {
           if (err.name === 'CastError' || err.name === 'ValidationError') {
             throw new CastError('Переданы некорректные данные');
           }
+          throw err;
         })
         .catch(next);
     })
@@ -76,13 +77,11 @@ const login = (req, res, next) => {
   return User.findOne({ email }).select('+password')
     .then((user) => {
       if (!user) {
-        console.log('Пользователь не найден в БД');
         throw new UnauthorizedError('Неправильный логин или пароль');
       }
       return bcrypt.compare(password, user.password)
         .then((matched) => {
           if (!matched) {
-            console.log('Неправильно введен пароль');
             throw new UnauthorizedError('Неправильный логин или пароль');
           }
           return user;

@@ -22,8 +22,10 @@ mainRouter.post('/signin', celebrate({
   }),
 }), login);
 
-mainRouter.use('/users', auth, userRoutes);
-mainRouter.use('/movies', auth, movieRoutes);
+mainRouter.use(auth);
+
+mainRouter.use('/users', userRoutes);
+mainRouter.use('/movies', movieRoutes);
 
 mainRouter.use('/*', () => {
   throw new NotFoundError('Запрашиваемый ресурс не найден');
