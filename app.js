@@ -1,5 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const cors = require('cors');
 const { errors } = require('celebrate');
 require('dotenv').config();
 // const helmet = require('helmet');
@@ -11,6 +12,12 @@ const errorHandler = require('./middlewares/errorHandler');
 const app = express();
 
 const { PORT = 3005 } = process.env;
+
+app.use(cors({
+  origin: true,
+  exposedHeaders: '*',
+  credentials: true,
+}));
 
 mongoose.connect('mongodb://localhost:27017/bitfilmsdb', {
   useNewUrlParser: true,

@@ -17,6 +17,7 @@ const getUser = (req, res, next) => {
       res.send({
         email: user.email,
         name: user.name,
+        _id: user._id,
       });
     })
     .catch((err) => {
@@ -89,7 +90,7 @@ const login = (req, res, next) => {
     })
     .then((user) => {
       const token = jwt.sign({ _id: user._id }, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret', { expiresIn: '7d' });
-      res.send({ token });
+      res.send({ token, _id: user._id });
     })
     .catch(next);
 };
